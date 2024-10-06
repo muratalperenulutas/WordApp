@@ -185,7 +185,6 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
                   subtitle: Text(
                     downloadedWordLists[index]['wordCount'].toString() +
                         " words",
-                    style: TextStyle(color: Colors.black54),
                   ),
                   title: Text(downloadedWordLists[index]['wordListName']
                       .replaceAll("_", " ")),

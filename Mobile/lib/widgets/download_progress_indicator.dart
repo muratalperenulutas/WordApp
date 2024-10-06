@@ -3,17 +3,17 @@ import 'package:get/get.dart';
 import 'package:word_app/controllers/download_controller.dart';
 
 class DownloadIndicator extends StatelessWidget {
-  final DownloadController downloadController;
+  final DownloadTask task;
   final Function onPressed;
 
   const DownloadIndicator(
-      {Key? key, required this.downloadController, required this.onPressed})
+      {Key? key, required this.task, required this.onPressed})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-    switch (downloadController.downloadState.value) {
+    switch (task.state.value) {
       case DownloadState.idle:
         return IconButton(icon: Icon(Icons.download), onPressed: () => onPressed());
       case DownloadState.downloading:

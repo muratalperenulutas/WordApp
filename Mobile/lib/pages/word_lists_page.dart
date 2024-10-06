@@ -45,6 +45,7 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
   }
 
   void _showDownloadableLists() {
+    downloadController.resetDownloads();
     if (downloadableWordLists.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("No downloadable lists available!")),
@@ -56,16 +57,16 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
           return Column(
             mainAxisSize: MainAxisSize.min,
             children: downloadableWordLists.map((list) {
+              downloadController.addTask(list['wordListName']);
               return ListTile(
                 subtitle: Text(
                   list['wordCount'].toString() + " words",
-                  style: TextStyle(color: Colors.black54),
                 ),
                 title: Text(list['wordListName'].replaceAll("_", " ")),
                 trailing:DownloadIndicator(
-                    downloadController: downloadController,
+                    task: downloadController.tasks.firstWhere((task) => task.id == list['wordListName']),
                     onPressed: () {
-                      downloadController.startDownload();
+                      downloadController.startDownload(list['wordListName']);
                       webSocketClient.GET_WORDS_FROM_LIST(list['wordListName']);
                     },
                 ));

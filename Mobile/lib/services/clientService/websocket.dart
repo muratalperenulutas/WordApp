@@ -51,13 +51,13 @@ class WebSocketClient {
           word_model model = word_model.fromJson(jsonData['data']['words'][i]);
           _databaseHelper.insertWord(
               wordListName: wordListName, wordModel: model);
-          downloadController.updateProgress((i + 1) / wordCount);
+          downloadController.updateProgress(wordListName,(i + 1) / wordCount);
         }
       }
       if (wordCount == jsonData['data']['words'].length) {
         _databaseHelper.updateWordListAsDownloaded(wordListName: wordListName);
         onUiUpdate();
-        downloadController.downloadSuccess();
+        downloadController.downloadSuccess(wordListName);
       } else {
         //delete unmatched lists words
         print("Words count not match!");

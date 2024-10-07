@@ -17,13 +17,13 @@ class SideMenuPanel extends StatelessWidget {
               child: ListView(
                 padding: EdgeInsets.zero,
                 children: <Widget>[
-                  const DrawerHeader(
+                  DrawerHeader(
                     duration: Duration(milliseconds: 100),
                     decoration: BoxDecoration(
                       color: Colors.blue,
                     ),
                     child: Text(//image
-                      'Menu',
+                      'Menu'.tr,
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 24,
@@ -32,7 +32,7 @@ class SideMenuPanel extends StatelessWidget {
                   ),
                   ListTile(
                     leading: const Icon(Icons.list_alt),
-                    title: const Text('Word Lists'),
+                    title: Text('Word_Lists'.tr),
                     onTap: () {
                       Get.back();
                       Get.toNamed('/wordLists');
@@ -40,7 +40,7 @@ class SideMenuPanel extends StatelessWidget {
                   ),
                   ListTile(
                     leading: const Icon(Icons.swipe_vertical_rounded),
-                    title: const Text('Scrollable Words'),
+                    title: Text('Scrollable_Word_Cards'.tr),
                     onTap: () {
                       Get.back();
                       Get.toNamed('/scrollable');
@@ -48,7 +48,7 @@ class SideMenuPanel extends StatelessWidget {
                   ),
                   ListTile(
                     leading: const Icon(Icons.library_books_outlined),
-                    title: const Text('Draggable Word Cards'),
+                    title: Text('Draggable_Word_Cards'.tr),
                     onTap: () {
                       Get.back();
                       Get.toNamed('/draggable');
@@ -56,7 +56,7 @@ class SideMenuPanel extends StatelessWidget {
                   ),
                   ListTile(
                     leading: const Icon(Icons.settings),
-                    title: const Text('Settings'),
+                    title: Text('Settings'.tr),
                     onTap: () {
                       Get.back();
                       Get.toNamed('/settings');
@@ -67,7 +67,7 @@ class SideMenuPanel extends StatelessWidget {
             ),
             ListTile(
               leading: const Icon(Icons.info),
-              title: const Text('About'),
+              title: Text('About'.tr),
               onTap: () {
                 showDialog(
                   context: context,

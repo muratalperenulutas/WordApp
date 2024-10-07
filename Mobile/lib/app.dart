@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:word_app/controllers/app_controller.dart';
 import 'package:word_app/initialPage.dart';
+import 'package:word_app/lang/app_translations.dart';
 import 'package:word_app/pages/draggable_word_cards_page/draggable_word_cards_page.dart';
 import 'package:word_app/pages/scrollable_words_page.dart';
 import 'package:word_app/pages/settings_page.dart';
@@ -16,6 +17,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Obx(() {
       return GetMaterialApp(
+        translations: AppTranslations(),
+        locale: Locale(appController.selectedLanguage.value == 'English' ? 'en' : 'tr'),
+        fallbackLocale: Locale('en', 'US'),
           initialRoute: '/',
           getPages: [
             GetPage(name: '/', page: () => initialPage()),

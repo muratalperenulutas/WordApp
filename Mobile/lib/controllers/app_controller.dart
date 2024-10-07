@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,6 +17,15 @@ class AppController extends GetxController {
     final prefs = await SharedPreferences.getInstance();
     isDarkTheme.value = prefs.getBool('isDarkTheme') ?? false;
     isScrollableWordsVertical.value = prefs.getBool('scrollableWordsVertical') ?? false;
+    selectedLanguage.value=prefs.getString("selectedLanguage")??'Turkish';
+    switch (selectedLanguage.value) {
+    case 'English':
+      Get.updateLocale(Locale('en', 'US'));
+      break;
+    case 'Turkish':
+    Get.updateLocale(Locale('tr', 'TR'));
+    default:
+  }
   }
 
   void _savePreferences() async {
@@ -34,9 +44,18 @@ class AppController extends GetxController {
     _savePreferences();
   }
 
-  void setLanguage(String language) {
-    selectedLanguage.value = language;
-    
+  void setLanguage(String language) async {
+  selectedLanguage.value = language;
+  final prefs = await SharedPreferences.getInstance();
+  prefs.setString('selectedLanguage', language);
+  switch (language) {
+    case 'English':
+      Get.updateLocale(Locale('en', 'US'));
+      break;
+    case 'Turkish':
+    Get.updateLocale(Locale('tr', 'TR'));
+    default:
   }
+}
 
 }

@@ -88,7 +88,7 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
             children: [
               SizedBox(height: 5),
               Text(
-                'Delete List?',
+                'Delete_List?'.tr,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 10),
@@ -104,7 +104,7 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text('Cancel'),
+                    child: Text('Cancel'.tr),
                   ),
                   SizedBox(width: 10),
                   TextButton(
@@ -115,7 +115,7 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
                       });
                       Navigator.pop(context);
                     },
-                    child: Text('Delete'),
+                    child: Text('Delete'.tr),
                   ),
                 ],
               ),
@@ -158,7 +158,7 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Word Lists'),
+        title: Text('Word_Lists'.tr),
         actions: [
           IconButton(
             icon: Icon(Icons.download),
@@ -176,7 +176,7 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
       ),
       body: downloadedWordLists.length == 0
           ? Center(
-              child: Text("There is no list yet."),
+              child: Text('There_is_no_list_yet.'.tr),
             )
           : ListView.builder(
               itemCount: downloadedWordLists.length,

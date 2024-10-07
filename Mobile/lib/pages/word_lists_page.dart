@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:word_app/controllers/download_controller.dart';
 import 'package:word_app/services/clientService/websocket.dart';
 import 'package:word_app/services/dbService/database_helper.dart';
@@ -59,18 +58,18 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
             children: downloadableWordLists.map((list) {
               downloadController.addTask(list['wordListName']);
               return ListTile(
-                subtitle: Text(
-                  list['wordCount'].toString() + " words",
-                ),
-                title: Text(list['wordListName'].replaceAll("_", " ")),
-                trailing:DownloadIndicator(
-                    task: downloadController.tasks.firstWhere((task) => task.id == list['wordListName']),
+                  subtitle: Text(
+                    list['wordCount'].toString() + " words",
+                  ),
+                  title: Text(list['wordListName'].replaceAll("_", " ")),
+                  trailing: DownloadIndicator(
+                    task: downloadController.tasks
+                        .firstWhere((task) => task.id == list['wordListName']),
                     onPressed: () {
                       downloadController.startDownload(list['wordListName']);
                       webSocketClient.GET_WORDS_FROM_LIST(list['wordListName']);
                     },
-                ));
-              
+                  ));
             }).toList(),
           );
         },

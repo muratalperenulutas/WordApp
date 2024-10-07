@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:word_app/controllers/app_controller.dart';
-import 'package:word_app/my_app_body.dart';
-import 'package:word_app/side_menu_panel.dart';
+import 'package:word_app/initialPage.dart';
+import 'package:word_app/pages/draggable_word_cards_page/draggable_word_cards_page.dart';
+import 'package:word_app/pages/scrollable_words_page.dart';
+import 'package:word_app/pages/settings_page.dart';
+import 'package:word_app/pages/word_lists_page.dart';
 import 'package:word_app/themes/app_theme.dart';
 
 class MyApp extends StatelessWidget {
@@ -11,10 +14,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double screenHeight = MediaQuery.of(context).size.height;
-
     return Obx(() {
       return GetMaterialApp(
+          initialRoute: '/',
+          getPages: [
+            GetPage(name: '/', page: () => initialPage()),
+            GetPage(name: '/settings', page: () => SettingsPage()),
+            GetPage(name: '/draggable', page: () => DraggableWordCards()),
+            GetPage(name: '/scrollable', page: () => ScrollableWords()),
+            GetPage(name: '/wordLists', page: () => MyWordListsPage()),
+          ],
           debugShowCheckedModeBanner: false,
           //theme: Get.find<AppController>().isDarkTheme.value?ThemeData.dark():ThemeData.light(),
           theme: AppTheme.lightTheme,
@@ -22,24 +31,7 @@ class MyApp extends StatelessWidget {
           themeMode: appController.isDarkTheme.value
               ? ThemeMode.dark
               : ThemeMode.light,
-          home: Scaffold(
-            appBar: AppBar(
-              title: Text(
-                "Word App",
-              ),
-              toolbarHeight: screenHeight * 0.06,
-              leading: Builder(
-                builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer();
-                  },
-                ),
-              ),
-            ),
-            drawer: SideMenuPanel(),
-            body: MyAppBody(),
-          ));
+          home: initialPage());
     });
   }
 }

@@ -1,7 +1,5 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:get/get.dart';
-import 'package:get/get_utils/get_utils.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:word_app/constants/server_url.dart';
 import 'package:word_app/controllers/download_controller.dart';

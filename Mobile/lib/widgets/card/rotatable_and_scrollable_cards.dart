@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:word_app/controllers/app_controller.dart';
 import 'package:word_app/widgets/card/back_side.dart';
-import 'package:word_app/widgets/card/card_finish.dart';
 import 'package:word_app/widgets/card/front_side.dart';
 
 class RotatableScrollableCards extends StatefulWidget {

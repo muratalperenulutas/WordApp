@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:word_app/pages/settings_page.dart';
-import 'package:word_app/pages/scrollable_words_page.dart';
-import 'package:word_app/pages/draggable_word_cards_page/draggable_word_cards_page.dart';
-import 'package:word_app/pages/word_lists_page.dart';
 
 class SideMenuPanel extends StatelessWidget {
   const SideMenuPanel({
@@ -13,7 +9,7 @@ class SideMenuPanel extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: MediaQuery.of(context).size.width * 0.5,
+      width: MediaQuery.of(context).size.width * 0.6,
       child: Drawer(
         child: Column(
           children: <Widget>[
@@ -26,7 +22,7 @@ class SideMenuPanel extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: Colors.blue,
                     ),
-                    child: Text(
+                    child: Text(//image
                       'Menu',
                       style: TextStyle(
                         color: Colors.white,
@@ -38,53 +34,32 @@ class SideMenuPanel extends StatelessWidget {
                     leading: const Icon(Icons.list_alt),
                     title: const Text('Word Lists'),
                     onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MyWordListsPage()
-                        ),
-                      );
+                      Get.back();
+                      Get.toNamed('/wordLists');
                     },
                   ),
                   ListTile(
                     leading: const Icon(Icons.swipe_vertical_rounded),
                     title: const Text('Scrollable Words'),
                     onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ScrollableWords()
-                          
-                        ),
-                      );
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.settings),
-                    title: const Text('Settings'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => SettingsPage(),
-                        ),
-                      );
+                      Get.back();
+                      Get.toNamed('/scrollable');
                     },
                   ),
                   ListTile(
                     leading: const Icon(Icons.library_books_outlined),
                     title: const Text('Draggable Word Cards'),
                     onTap: () {
-                      Navigator.pop(context);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => DraggableWordCards(),
-                        ),
-                      );
+                      Get.back();
+                      Get.toNamed('/draggable');
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.settings),
+                    title: const Text('Settings'),
+                    onTap: () {
+                      Get.back();
+                      Get.toNamed('/settings');
                     },
                   ),
                 ],
@@ -97,7 +72,7 @@ class SideMenuPanel extends StatelessWidget {
                 showDialog(
                   context: context,
                   builder: (BuildContext context) {
-                    return AboutDialog(
+                    return const AboutDialog(
                       applicationVersion: "1.0.0",
                       applicationName: "Word App",
                     );
@@ -111,6 +86,3 @@ class SideMenuPanel extends StatelessWidget {
     );
   }
 }
-
-
-//no

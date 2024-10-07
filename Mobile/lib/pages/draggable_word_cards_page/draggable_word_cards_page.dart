@@ -18,7 +18,7 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
   int index = 0;
 
   int count = 0;
-  List<Map<String, dynamic>> dropdownValues=[];
+  List<Map<String, dynamic>> dropdownValues = [];
   String dropdownValue = 'Oxford Lists A1';
 
   void initState() {
@@ -29,13 +29,66 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
   Future<void> _initDatabase() async {
     List<Map<String, dynamic>> randWords = await dbHelper
         .getRandomWordsFromList(wordListName: "Oxford_Lists_B2", count: 5);
-    List<Map<String, dynamic>> downloadedLists=await dbHelper.getDownloadedWordListsInfos();
+    List<Map<String, dynamic>> downloadedLists =
+        await dbHelper.getDownloadedWordListsInfos();
     //print(randWords);
 
     setState(() {
       words = randWords;
-      dropdownValues=downloadedLists;
+      dropdownValues = downloadedLists;
     });
+  }
+
+  Widget _buildRowWithCounter(String label, int count) {
+    return Row(
+      children: [
+        Text(label),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              count--;
+            });
+          },
+          icon: Icon(Icons.remove),
+        ),
+        Text(count.toString()),
+        IconButton(
+          onPressed: () {
+            setState(() {
+              count++;
+            });
+          },
+          icon: Icon(Icons.add),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdownRow(
+      String label, String dropdownValue, List<dynamic> dropdownValues) {
+    return Row(
+      children: [
+        Text(label),
+        DropdownButton<String>(
+          value: dropdownValue,
+          onChanged: (String? newValue) {
+            setState(() {
+              dropdownValue = newValue!;
+            });
+          },
+          items: dropdownValues
+              .map((item) =>
+                  item['wordListName'].toString().replaceAll("_", " "))
+              .toList()
+              .map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ),
+      ],
+    );
   }
 
   void _increaseIndex() {
@@ -63,66 +116,10 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Text('Word Count: '),
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  count--;
-                                });
-                              },
-                              icon: Icon(Icons.remove)),
-                          Text(count.toString()),
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  count++;
-                                });
-                              },
-                              icon: Icon(Icons.add))
-                        ],
-                      ),
-                      Row(children: [
-                        Text("Selected List: "),
-                        
-                        DropdownButton<String>(
-                          value: dropdownValue,
-                          onChanged: (String? newValue) {
-                            setState(() {
-                              dropdownValue = newValue!;
-                            });
-                          },   
-                          items: dropdownValues.map((item) => item['wordListName'].toString().replaceAll("_"," ")).toList()
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
-                            );
-                          }).toList(),
-                        ),
-                      ]),
-                      
-                      Row(
-                        children: [
-                          Text("Remember count:"),
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  count--;
-                                });
-                              },
-                              icon: Icon(Icons.remove)),
-                          Text(count.toString()),
-                          IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  count++;
-                                });
-                              },
-                              icon: Icon(Icons.add))
-                        ],
-                      )
+                      _buildRowWithCounter("Word Count: ", count),
+                      _buildDropdownRow(
+                          "Selected List: ", dropdownValue, dropdownValues),
+                      _buildRowWithCounter("Remember count:", count),
                     ],
                   ),
                 ),

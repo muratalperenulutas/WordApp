@@ -79,6 +79,16 @@ class DatabaseHelper {
     return result.length;
   }
 
+  Future<List<Map<String, dynamic>>> getMeaningByWord(String word) async {
+    final db = await database;
+    final result = await db.query(
+      'words',
+      where: 'word = ?',
+      whereArgs: [word],
+    );
+    return result;
+  }
+
   Future<Object?> isWordListsAlreadyDownloaded(String wordListName) async {
     final db = await database;
     final result=await db

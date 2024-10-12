@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:word_app/controllers/app_controller.dart';
-import 'package:word_app/initialPage.dart';
+import 'package:word_app/pages/main_page/main_page.dart';
 import 'package:word_app/lang/app_translations.dart';
 import 'package:word_app/pages/draggable_word_cards_page/draggable_word_cards_page.dart';
 import 'package:word_app/pages/scrollable_words_page.dart';

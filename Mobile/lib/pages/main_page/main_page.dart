@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:word_app/my_app_body.dart';
+import 'package:word_app/pages/main_page/main_page_body.dart';
 import 'package:word_app/side_menu_panel.dart';
 
 
@@ -25,7 +25,7 @@ class initialPage extends StatelessWidget {
               ),
             ),
             drawer: SideMenuPanel(),
-            body: MyAppBody(),
+            body: MainPageBody(),
           );
   }
 }

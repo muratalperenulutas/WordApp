@@ -25,7 +25,7 @@ class DatabaseHelper {
           'CREATE TABLE words(id INTEGER PRIMARY KEY AUTOINCREMENT, wordListName TEXT, word TEXT, meaning1 TEXT, meaning2 TEXT, meaning3 TEXT)',
         );
         db.execute(
-          'CREATE TABLE wordListsInfos(id INTEGER PRIMARY KEY AUTOINCREMENT, wordListName TEXT,wordCount INTEGER,isDownloaded BOOL DEFAULT FALSE)',
+          'CREATE TABLE wordListsInfos(id INTEGER PRIMARY KEY AUTOINCREMENT, wordListName TEXT,wordCount INTEGER,isDownloaded INTEGER DEFAULT 0)',
         );
       },
       version: 3,

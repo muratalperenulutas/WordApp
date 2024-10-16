@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:word_app/controllers/app_controller.dart';
 import 'package:word_app/services/dbService/database_helper.dart';
 import 'package:word_app/widgets/card/rotatable_and_scrollable_cards.dart';
 
@@ -10,10 +12,11 @@ class ScrollableWords extends StatefulWidget {
 }
 
 class _ScrollableWordsState extends State<ScrollableWords> {
+  final AppController appController = Get.find<AppController>();
   final dbHelper = DatabaseHelper();
   List<Map<String, dynamic>> words = [];
-    List<Map<String, dynamic>> dropdownValues = [];
-  String dropdownValue = 'Oxford Lists A1';
+  List<Map<String, dynamic>> dropdownValues = [];
+
 
   void initState() {
     super.initState();
@@ -21,10 +24,11 @@ class _ScrollableWordsState extends State<ScrollableWords> {
   }
 
   Future<void> _initDatabase() async {
-    List<Map<String, dynamic>> randWords = await dbHelper.getRandomWords(
-        wordListName: "Oxford_Lists_A1", count: 15);
+    List<Map<String, dynamic>> randWords = await dbHelper.getRandomWordsFromList(
+        wordListName: appController.selectedScrollableWordsPageList.value.replaceAll(" ", "_"), count: 15);
         List<Map<String, dynamic>> downloadedLists =
         await dbHelper.getDownloadedWordListsInfos();
+        print(appController.selectedScrollableWordsPageList.value);
 
     //print(randWords);
 
@@ -34,32 +38,72 @@ class _ScrollableWordsState extends State<ScrollableWords> {
     });
   }
 
-    Widget _buildDropdownRow(
-      String label, String dropdownValue, List<dynamic> dropdownValues) {
-    return Row(
-      children: [
-        Text(label),
-        DropdownButton<String>(
-          value: dropdownValue,
-          onChanged: (String? newValue) {
-            setState(() {
-              dropdownValue = newValue!;
-            });
-          },
-          items: dropdownValues
-              .map((item) =>
-                  item['wordListName'].toString().replaceAll("_", " "))
-              .toList()
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
+  void _showDropdownBottomSheet(BuildContext context,
+   List<dynamic> dropdownValues) {
+  showModalBottomSheet(
+    context: context,
+    builder: (BuildContext context) {
+      List<DropdownMenuItem<String>> dropdownItems = dropdownValues
+          .map((item) =>
+              item['wordListName'].toString().replaceAll("_", " "))
+          .toList()
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList();
+
+      if (!dropdownItems.any((item) => item.value == appController.selectedScrollableWordsPageList.value.replaceAll("_", " "))) {
+        appController.setScrollableWordsPageList(dropdownItems.isNotEmpty ? dropdownItems.first.value! : "");
+      }
+
+      return Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Obx(()=>
+            ListTile(
+              title: Text("Selected List"),
+              trailing: DropdownButton<String>(
+                value: appController.selectedScrollableWordsPageList.value.isEmpty ? null : appController.selectedScrollableWordsPageList.value.replaceAll("_", " "),
+                onChanged: (String? newValue) {
+                  setState(() {
+                    appController.setScrollableWordsPageList(newValue!);
+                    _initDatabase();
+                  });
+                },
+                items: dropdownItems,
+              ),
+            ),),
+            Obx(() => ListTile(
+                  title: Text('Swipple_Words_Direction'.tr),
+                  trailing: DropdownButton<String>(
+                    value: appController.isScrollableWordsVertical.value
+                        ? 'Vertical'
+                        : 'Horizontal',
+                    onChanged: (String? newValue) {
+                      appController.toggleSwippleDirection();
+                    },
+                    items: <String>['Horizontal', 'Vertical']
+                        .map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value.tr),
+                      );
+                    }).toList(),
+                  ),
+                )),
+          ],
         ),
-      ],
-    );
-  }
+      );
+    },
+  );
+}
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -67,22 +111,9 @@ class _ScrollableWordsState extends State<ScrollableWords> {
     double screenWidth = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
-        actions: [PopupMenuButton(
+        actions: [IconButton(
             icon: Icon(Icons.settings),
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildDropdownRow(
-                          "Selected List: ", dropdownValue, dropdownValues),
-                    ],
-                  ),
-                ),
-              ];
-            },
+            onPressed: (){_showDropdownBottomSheet(context,dropdownValues);},
           ),],
       ),
       body: SafeArea(

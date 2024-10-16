@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:word_app/controllers/app_controller.dart';
 import 'package:word_app/pages/draggable_word_cards_page/widgets/bottom_buttons.dart';
 import 'package:word_app/services/dbService/database_helper.dart';
 import 'package:word_app/widgets/card/rotatable_and_draggable_cards.dart';
@@ -16,10 +18,10 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
   final dbHelper = DatabaseHelper();
   List<Map<String, dynamic>> words = [];
   int index = 0;
-
+  final AppController appController = Get.find<AppController>();
   int count = 0;
   List<Map<String, dynamic>> dropdownValues = [];
-  String dropdownValue = 'Oxford Lists A1';
+
 
   void initState() {
     super.initState();
@@ -28,7 +30,7 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
 
   Future<void> _initDatabase() async {
     List<Map<String, dynamic>> randWords = await dbHelper
-        .getRandomWordsFromList(wordListName: "Oxford_Lists_B2", count: 5);
+        .getRandomWordsFromList(wordListName: appController.selectedDraggableWordsPageList.value.replaceAll(" ", "_"), count: 5);
     List<Map<String, dynamic>> downloadedLists =
         await dbHelper.getDownloadedWordListsInfos();
     //print(randWords);
@@ -39,10 +41,10 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
     });
   }
 
-  Widget _buildRowWithCounter(String label, int count) {
+  Widget _buildRowWithCounter(int count) {
     return Row(
+      mainAxisSize: MainAxisSize.min ,
       children: [
-        Text(label),
         IconButton(
           onPressed: () {
             setState(() {
@@ -51,7 +53,7 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
           },
           icon: Icon(Icons.remove),
         ),
-        Text(count.toString()),
+        Text(count.toString(),style: TextStyle(fontSize: 17),),
         IconButton(
           onPressed: () {
             setState(() {
@@ -64,32 +66,7 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
     );
   }
 
-  Widget _buildDropdownRow(
-      String label, String dropdownValue, List<dynamic> dropdownValues) {
-    return Row(
-      children: [
-        Text(label),
-        DropdownButton<String>(
-          value: dropdownValue,
-          onChanged: (String? newValue) {
-            setState(() {
-              dropdownValue = newValue!;
-            });
-          },
-          items: dropdownValues
-              .map((item) =>
-                  item['wordListName'].toString().replaceAll("_", " "))
-              .toList()
-              .map<DropdownMenuItem<String>>((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
+
 
   void _increaseIndex() {
     if (index < words.length) {
@@ -97,6 +74,60 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
         index++;
       });
     }
+  }
+  void _showDropdownBottomSheet(BuildContext context,List<dynamic> dropdownValues) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        List<DropdownMenuItem<String>> dropdownItems = dropdownValues
+          .map((item) =>
+              item['wordListName'].toString().replaceAll("_", " "))
+          .toList()
+          .map<DropdownMenuItem<String>>((String value) {
+        return DropdownMenuItem<String>(
+          value: value,
+          child: Text(value),
+        );
+      }).toList();
+
+      if (!dropdownItems.any((item) => item.value == appController.selectedDraggableWordsPageList.value.replaceAll("_", " "))) {
+        appController.setDraggableWordsPageList(dropdownItems.isNotEmpty ? dropdownItems.first.value! : "");
+      }
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: Text("Word count:"),
+                trailing: _buildRowWithCounter(3),
+              ),
+
+              ListTile(
+                title: Text("Remember count:"),
+                trailing: _buildRowWithCounter(5)
+              ),
+              
+              Obx(()=>ListTile(
+                title: Text("Selected List"),
+                trailing:
+                DropdownButton<String>(
+                  value: appController.selectedDraggableWordsPageList.value.isEmpty ? null : appController.selectedDraggableWordsPageList.value.replaceAll("_", " "),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      appController.setDraggableWordsPageList(newValue!);
+                      _initDatabase();
+                    });
+                  },
+                  items:dropdownItems
+                ),
+
+              ),)
+            ],
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -107,24 +138,9 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          PopupMenuButton(
+          IconButton(
             icon: Icon(Icons.settings),
-            itemBuilder: (BuildContext context) {
-              return [
-                PopupMenuItem(
-                  padding: EdgeInsets.all(10),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildRowWithCounter("Word Count: ", count),
-                      _buildDropdownRow(
-                          "Selected List: ", dropdownValue, dropdownValues),
-                      _buildRowWithCounter("Remember count:", count),
-                    ],
-                  ),
-                ),
-              ];
-            },
+            onPressed: (){_showDropdownBottomSheet(context,dropdownValues);},
           ),
         ],
         title: Text('Draggable Word Cards'),

@@ -5,7 +5,7 @@ import 'package:word_app/constants/server_url.dart';
 import 'package:word_app/controllers/download_controller.dart';
 import 'package:word_app/models/word_list_model.dart';
 import 'package:word_app/services/dbService/database_helper.dart';
-import 'package:word_app/models/word.dart';
+import 'package:word_app/models/word_model.dart';
 
 class WebSocketClient {
   final IOWebSocketChannel channel;
@@ -27,10 +27,10 @@ class WebSocketClient {
     channel.sink.add(jsonMessage);
   }
 
-  void GET_WORDS_FROM_LIST(String listName) {
+  void GET_WORDS_FROM_LIST(String listId) {
     String jsonMessage = jsonEncode({
       'command': 'GET_WORDS_FROM_LIST',
-      'params': {"listName": listName}
+      'params': {"wordListId": listId}
     });
     channel.sink.add(jsonMessage);
   }
@@ -40,34 +40,33 @@ class WebSocketClient {
     print(jsonData);
 
     if (jsonData['command'] == 'WORDS_FROM_LIST') {
-      String wordListName = jsonData["data"]["listName"];
+      String wordListId = jsonData["data"]["listId"];
       int wordCount = jsonData["data"]['wordCount'];
       final _isWordListsAlreadyExist =
-          await _databaseHelper.isWordListsAlreadyDownloaded(wordListName);
+          await _databaseHelper.isWordListsAlreadyDownloaded(wordListId);
       if (_isWordListsAlreadyExist == 0) {
         for (int i = 0; i < jsonData['data']['words'].length; i++) {
           word_model model = word_model.fromJson(jsonData['data']['words'][i]);
-          _databaseHelper.insertWord(
-              wordListName: wordListName, wordModel: model);
-          downloadController.updateProgress(wordListName,(i + 1) / wordCount);
+          _databaseHelper.insertWord(wordListId: wordListId, wordModel: model);
+          downloadController.updateProgress(wordListId, (i + 1) / wordCount);
         }
       }
       if (wordCount == jsonData['data']['words'].length) {
-        _databaseHelper.updateWordListAsDownloaded(wordListName: wordListName);
+        _databaseHelper.updateWordListAsDownloaded(wordListId: wordListId);
         onUiUpdate();
-        downloadController.downloadSuccess(wordListName);
+        downloadController.downloadSuccess(wordListId);
       } else {
         //delete unmatched lists words
         print("Words count not match!");
       }
     } else if (jsonData['command'] == 'WORD_LISTS') {
-    
       for (var listData in jsonData['data']) {
-        bool result=await _databaseHelper.isWordListsInfoAlreadyExist(listData['listName']);
-        if(result){
-          print(result);
         word_list_model wordListModel = word_list_model.fromJson(listData);
-        _databaseHelper.insertWordListInfo(wordListModel: wordListModel);
+        bool result =
+            await _databaseHelper.isWordListsInfoAlreadyExist(wordListModel.wordListId);
+        if (result) {
+          print(result);
+          _databaseHelper.insertWordListInfo(wordListModel: wordListModel);
         }
       }
       onUiUpdate();

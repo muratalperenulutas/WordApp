@@ -6,16 +6,16 @@ const commandMap = {
   GET_WORDS_FROM_LIST: handleGetWordsFromList,
 };
 
-function getWordsFromList(listName) {
+function getWordsFromList(listId) {
   console.log("1");
-  const filePath = path.join(__dirname, "json_files", `${listName}.json`);
+  const filePath = path.join(__dirname, "json_files", `${listId}.json`);
 
   if (fs.existsSync(filePath)) {
     const fileData = JSON.parse(fs.readFileSync(filePath, "utf8"));
     const wordCount = fileData.length;
 
     return {
-      listName: listName,
+      listId: listId,
       wordCount: wordCount,
       words: fileData,
     };
@@ -36,8 +36,8 @@ function handleGetWordListsInfos(ws) {
 }
 
 function handleGetWordsFromList(ws, params) {
-  const listName = params.listName;
-  const listInfo = getWordsFromList(listName);
+  const listId = params.wordListId;
+  const listInfo = getWordsFromList(listId);
 
   if (listInfo) {
     ws.send(JSON.stringify({ command: "WORDS_FROM_LIST", data: listInfo }));
@@ -45,7 +45,7 @@ function handleGetWordsFromList(ws, params) {
     ws.send(
       JSON.stringify({
         command: "ERROR",
-        message: `List not found: ${listName}`,
+        message: `List not found: ${listId}`,
       })
     );
   }

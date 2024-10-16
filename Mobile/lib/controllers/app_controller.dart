@@ -6,8 +6,8 @@ class AppController extends GetxController {
   var isDarkTheme = false.obs;
   var isScrollableWordsVertical = true.obs;
   var selectedLanguage = 'English'.obs;
-  var selectedScrollableWordsPageList = ''.obs;
-  var selectedDraggableWordsPageList = ''.obs;
+  var selectedScrollableWordsPageListId = ''.obs;
+  var selectedDraggableWordsPageListId = ''.obs;
 
   @override
   void onInit() {
@@ -20,7 +20,7 @@ class AppController extends GetxController {
     isDarkTheme.value = prefs.getBool('isDarkTheme') ?? false;
     isScrollableWordsVertical.value =
         prefs.getBool('scrollableWordsVertical') ?? false;
-    selectedLanguage.value = prefs.getString("selectedLanguage") ?? 'Turkish';
+    selectedLanguage.value = prefs.getString("selectedLanguage") ?? 'English';
     switch (selectedLanguage.value) {
       case 'English':
         Get.updateLocale(Locale('en', 'US'));
@@ -29,26 +29,22 @@ class AppController extends GetxController {
         Get.updateLocale(Locale('tr', 'TR'));
       default:
     }
-    selectedScrollableWordsPageList.value =
-        prefs.getString("selectedScrollableWordsPageList") ?? "";
-    selectedDraggableWordsPageList.value =
-        prefs.getString("selectedDraggableWordsPageList") ?? "";
+    selectedScrollableWordsPageListId.value =
+        prefs.getString("selectedScrollableWordsPageListId") ?? "";
+    selectedDraggableWordsPageListId.value =
+        prefs.getString("selectedDraggableWordsPageListId") ?? "";
   }
 
-  void _savePreferences() async {
+  void toggleTheme() async {
+    isDarkTheme.value = !isDarkTheme.value;
     final prefs = await SharedPreferences.getInstance();
     prefs.setBool('isDarkTheme', isDarkTheme.value);
-    prefs.setBool('scrollableWordsVertical', isScrollableWordsVertical.value);
   }
 
-  void toggleTheme() {
-    isDarkTheme.value = !isDarkTheme.value;
-    _savePreferences();
-  }
-
-  void toggleSwippleDirection() {
+  void toggleSwippleDirection() async {
+    final prefs = await SharedPreferences.getInstance();
     isScrollableWordsVertical.value = !isScrollableWordsVertical.value;
-    _savePreferences();
+    prefs.setBool('scrollableWordsVertical', isScrollableWordsVertical.value);
   }
 
   void setLanguage(String language) async {
@@ -65,15 +61,15 @@ class AppController extends GetxController {
     }
   }
 
-  void setScrollableWordsPageList(String wordListName) async {
-    selectedScrollableWordsPageList.value = wordListName;
+  void setScrollableWordsPageListId(String wordListName) async {
+    selectedScrollableWordsPageListId.value = wordListName;
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('selectedScrollableWordsPageList', wordListName);
+    prefs.setString('selectedScrollableWordsPageListId', wordListName);
   }
 
-    void setDraggableWordsPageList(String wordListName) async {
-    selectedDraggableWordsPageList.value = wordListName;
+    void setDraggableWordsPageListId(String wordListName) async {
+    selectedDraggableWordsPageListId.value = wordListName;
     final prefs = await SharedPreferences.getInstance();
-    prefs.setString('selectedDraggableWordsPageList', wordListName);
+    prefs.setString('selectedDraggableWordsPageListId', wordListName);
   }
 }

@@ -1,19 +1,24 @@
 [
     {
-        "listName": "Oxford_Lists_A1",
-        "wordCount": 898
+        "wordListName": "Oxford Lists A1",
+        "wordCount": 898,
+        "wordListId": "4e85b0aa-0aeb-4fad-99c2-8aaec36e4689"
     },
     {
-        "listName": "Oxford_Lists_A2",
-        "wordCount": 866
+        "wordListName": "Oxford Lists A2",
+        "wordCount": 866,
+        "wordListId": "606a22ff-1717-44b3-b3b6-17f2b48f1a6b"
     },{
-        "listName": "Oxford_Lists_B1",
-        "wordCount": 802
+        "wordListName": "Oxford Lists B1",
+        "wordCount": 802,
+        "wordListId": "8e4c91f0-0701-49c6-bb66-bc5ec5745bbd"
     },{
-        "listName": "Oxford_Lists_B2",
-        "wordCount": 1424
+        "wordListName": "Oxford Lists B2",
+        "wordCount": 1424,
+        "wordListId": "2a8b495e-2df6-40b4-aaef-4daac8178802"
     },{
-        "listName": "Oxford_Lists_C1",
-        "wordCount": 1310
+        "wordListName": "Oxford Lists C1",
+        "wordCount": 1310,
+        "wordListId": "b3a38b44-6042-4edf-a254-c0a5f4072893"
     }
 ]

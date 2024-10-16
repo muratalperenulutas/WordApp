@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:word_app/services/dbService/database_helper.dart';
 
 class MyWordListPage extends StatefulWidget {
+  final String wordListId;
   final String wordListName;
-  MyWordListPage({required this.wordListName});
+  MyWordListPage({required this.wordListId,required this.wordListName});
 
   @override
   _MyWordListPageState createState() => _MyWordListPageState();
@@ -21,7 +22,7 @@ class _MyWordListPageState extends State<MyWordListPage> {
 
   Future<void> _initDatabase() async {
 
-    List<Map<String, dynamic>> allWords = await dbHelper.getAllListsWords(widget.wordListName);
+    List<Map<String, dynamic>> allWords = await dbHelper.getAllListsWords(widget.wordListId);
     
     //print(allWords.length);
     setState(() {

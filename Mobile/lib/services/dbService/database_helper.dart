@@ -1,6 +1,6 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
-import 'package:word_app/models/word.dart';
+import 'package:word_app/models/word_model.dart';
 import 'package:word_app/models/word_list_model.dart';
 
 class DatabaseHelper {
@@ -22,28 +22,36 @@ class DatabaseHelper {
       join(dbPath, 'word_app.db'),
       onCreate: (db, version) {
         db.execute(
-          'CREATE TABLE words(id INTEGER PRIMARY KEY AUTOINCREMENT, wordListName TEXT, word TEXT, meaning1 TEXT, meaning2 TEXT, meaning3 TEXT)',
+          'CREATE TABLE wordListsInfos('
+          'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+          'wordListId TEXT UNIQUE NOT NULL,'
+          'wordListName TEXT NOT NULL,'
+          'wordCount INTEGER NOT NULL,'
+          'isDownloaded INTEGER DEFAULT 0'
+          ')',
         );
         db.execute(
-          'CREATE TABLE wordListsInfos(id INTEGER PRIMARY KEY AUTOINCREMENT, wordListName TEXT,wordCount INTEGER,isDownloaded INTEGER DEFAULT 0)',
+          'CREATE TABLE words('
+          'id INTEGER PRIMARY KEY AUTOINCREMENT,'
+          'wordListId TEXT NOT NULL,'
+          'word TEXT NOT NULL,'
+          'meaning1 TEXT NOT NULL,'
+          'meaning2 TEXT,'
+          'meaning3 TEXT,'
+          'FOREIGN KEY(wordListId) REFERENCES wordListsInfos(wordListId)'
+          ')',
         );
       },
-      version: 3,
+      version: 4,
     );
   }
 
   Future<void> insertWord(
-      {required word_model wordModel, required wordListName}) async {
+      {required word_model wordModel, required wordListId}) async {
     final db = await database;
     await db.insert(
       'words',
-      {
-        'wordListName': wordListName,
-        'word': wordModel.word,
-        'meaning1': wordModel.meaning1,
-        'meaning2': wordModel.meaning2 ?? '',
-        'meaning3': wordModel.meaning3 ?? '',
-      },
+      wordModel.toJson(wordListId),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
@@ -53,19 +61,19 @@ class DatabaseHelper {
     final db = await database;
     await db.insert(
       'wordListsInfos',
-      {'wordListName': wordListModel.wordListName, 'wordCount': wordListModel.wordCount},
+      wordListModel.toJson(),
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
 
   Future<void> updateWordListAsDownloaded(
-      {required String wordListName}) async {
+      {required String wordListId}) async {
     final db = await database;
     await db.update(
       'wordListsInfos',
       {'isDownloaded': 1},
-      where: 'wordListName = ?',
-      whereArgs: [wordListName],
+      where: 'wordListId = ?',
+      whereArgs: [wordListId],
     );
   }
 
@@ -73,35 +81,35 @@ class DatabaseHelper {
     final db = await database;
     final result = await db.query(
       'words',
-      where: 'wordListName = ?',
+      where: 'wordListId = ?',
       whereArgs: [wordListName],
     );
     return result.length;
   }
 
-  Future<List<Map<String, dynamic>>> getMeaningByWord(String word) async {
+  Future<Map<String, dynamic>> getMeaningByWord(String word) async {
     final db = await database;
     final result = await db.query(
       'words',
       where: 'word = ?',
       whereArgs: [word],
     );
-    return result;
+    return result[0];
   }
 
-  Future<Object?> isWordListsAlreadyDownloaded(String wordListName) async {
+  Future<Object?> isWordListsAlreadyDownloaded(String wordListId) async {
     final db = await database;
-    final result=await db
-        .query('wordListsInfos', where: 'wordListName = ?', whereArgs: [wordListName]);
+    final result = await db.query('wordListsInfos',
+        where: 'wordListId = ?', whereArgs: [wordListId]);
     return result[0]['isDownloaded'];
   }
-  Future<bool> isWordListsInfoAlreadyExist(String wordListName) async {
+
+  Future<bool> isWordListsInfoAlreadyExist(String wordListId) async {
     final db = await database;
-    final result=await db
-        .query('wordListsInfos', where: 'wordListName = ?', whereArgs: [wordListName]);
+    final result = await db.query('wordListsInfos',
+        where: 'wordListId = ?', whereArgs: [wordListId]);
     return result.isEmpty;
   }
-  
 
   Future<List<Map<String, dynamic>>> getDownloadedWordListsInfos() async {
     final db = await database;
@@ -121,23 +129,22 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> getAllListsWords(
-      String wordListName) async {
+      String wordListId) async {
     final db = await database;
     return await db.query(
       'words',
-      where: 'wordListName = ?',
-      whereArgs: [wordListName],
+      where: 'wordListId = ?',
+      whereArgs: [wordListId],
     );
   }
 
   Future<int> deleteAllWords() async {
     final db = await database;
-    db.delete('wordListsInfos');
+    await db.delete('wordListsInfos');
     return await db.delete('words');
   }
 
-  Future<List<Map<String, dynamic>>> getRandomWords(
-      {required count}) async {
+  Future<List<Map<String, dynamic>>> getRandomWords({required count}) async {
     final db = await database;
     return await db.query(
       'words',
@@ -147,12 +154,12 @@ class DatabaseHelper {
   }
 
   Future<List<Map<String, dynamic>>> getRandomWordsFromList(
-      {required wordListName, count}) async {
+      {required wordListId, count}) async {
     final db = await database;
     return await db.query(
       'words',
-      where: 'wordListName = ?',
-      whereArgs: [wordListName],
+      where: 'wordListId = ?',
+      whereArgs: [wordListId],
       orderBy: 'RANDOM()',
       limit: count,
     );

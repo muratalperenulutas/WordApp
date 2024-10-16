@@ -1,3 +1,5 @@
+
+/*
 import 'package:word_app/services/dbService/database_helper.dart';
 
 class RandomWordService {
@@ -14,7 +16,7 @@ class RandomWordService {
     if (_wordCache[wordListName] == null ||
         _wordCache[wordListName]!.length < 50) {
       final List<Map<String, dynamic>> maps = await DatabaseHelper()
-          .getRandomWordsFromList(wordListName: wordListName, count: count);
+          .getRandomWordsFromList(wordListId: wordListName, count: count);
       //print(maps);
       _wordCache[wordListName] ??=[];
       _wordCache[wordListName]!.addAll(maps);
@@ -44,3 +46,4 @@ class RandomWordService {
     return result;
   }
 }
+*/

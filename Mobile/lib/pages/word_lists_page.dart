@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:word_app/controllers/download_controller.dart';
+import 'package:word_app/models/word_list_model.dart';
 import 'package:word_app/services/clientService/websocket.dart';
 import 'package:word_app/services/dbService/database_helper.dart';
 import 'package:word_app/pages/word_list_page.dart';
@@ -55,19 +56,20 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
         builder: (context) {
           return Column(
             mainAxisSize: MainAxisSize.min,
-            children: downloadableWordLists.map((list) {
-              downloadController.addTask(list['wordListName']);
+            children: downloadableWordLists.map((json) {
+              word_list_model  wordListModel= word_list_model.fromJson(json);
+              downloadController.addTask(wordListModel.wordListId);
               return ListTile(
                   subtitle: Text(
-                    list['wordCount'].toString() + " words",
+                    wordListModel.wordCount.toString() + " words",
                   ),
-                  title: Text(list['wordListName'].replaceAll("_", " ")),
+                  title: Text(wordListModel.wordListName),
                   trailing: DownloadIndicator(
                     task: downloadController.tasks
-                        .firstWhere((task) => task.id == list['wordListName']),
+                        .firstWhere((task) => task.id == wordListModel.wordListId),
                     onPressed: () {
-                      downloadController.startDownload(list['wordListName']);
-                      webSocketClient.GET_WORDS_FROM_LIST(list['wordListName']);
+                      downloadController.startDownload(wordListModel.wordListId);
+                      webSocketClient.GET_WORDS_FROM_LIST(wordListModel.wordListId);
                     },
                   ));
             }).toList(),
@@ -123,35 +125,7 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
           ),
         );
       },
-    ); /*
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Delete List'),
-          content: Text(
-              'Are you sure you want to delete the list "${lists[index]['wordListName']}"?'),
-          actions: [
-            TextButton(
-              child: Text('Cancel'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Delete'),
-              onPressed: () async {
-              //await dbHelper.deleteWordList(lists[index]['dbName']);
-                setState(() {
-                  lists.removeAt(index);
-                });
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );*/
+    );
   }
 
   @override
@@ -181,20 +155,20 @@ class _MyWordListsPageState extends State<MyWordListsPage> {
           : ListView.builder(
               itemCount: downloadedWordLists.length,
               itemBuilder: (context, index) {
+                word_list_model wordListModel=word_list_model.fromJson(downloadedWordLists[index]);
                 return ListTile(
                   subtitle: Text(
-                    downloadedWordLists[index]['wordCount'].toString() +
+                    wordListModel.wordCount.toString() +
                         " words",
                   ),
-                  title: Text(downloadedWordLists[index]['wordListName']
-                      .replaceAll("_", " ")),
+                  title: Text(wordListModel.wordListName),
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => MyWordListPage(
-                          wordListName: downloadedWordLists[index]
-                              ['wordListName'],
+                          wordListId: wordListModel.wordListId,
+                          wordListName:wordListModel.wordListName
                         ),
                       ),
                     );

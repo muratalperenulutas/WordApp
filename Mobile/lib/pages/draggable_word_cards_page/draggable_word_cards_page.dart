@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:word_app/controllers/app_controller.dart';
+import 'package:word_app/models/word_list_model.dart';
 import 'package:word_app/pages/draggable_word_cards_page/widgets/bottom_buttons.dart';
 import 'package:word_app/services/dbService/database_helper.dart';
 import 'package:word_app/widgets/card/rotatable_and_draggable_cards.dart';
@@ -20,7 +21,7 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
   int index = 0;
   final AppController appController = Get.find<AppController>();
   int count = 0;
-  List<Map<String, dynamic>> dropdownValues = [];
+  List<Map<String, dynamic>> downloadedWordLists = [];
 
 
   void initState() {
@@ -30,14 +31,14 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
 
   Future<void> _initDatabase() async {
     List<Map<String, dynamic>> randWords = await dbHelper
-        .getRandomWordsFromList(wordListName: appController.selectedDraggableWordsPageList.value.replaceAll(" ", "_"), count: 5);
+        .getRandomWordsFromList(wordListId: appController.selectedDraggableWordsPageListId.value, count: 5);
     List<Map<String, dynamic>> downloadedLists =
         await dbHelper.getDownloadedWordListsInfos();
     //print(randWords);
 
     setState(() {
       words = randWords;
-      dropdownValues = downloadedLists;
+      downloadedWordLists = downloadedLists;
     });
   }
 
@@ -75,24 +76,28 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
       });
     }
   }
-  void _showDropdownBottomSheet(BuildContext context,List<dynamic> dropdownValues) {
+  void _showDropdownBottomSheet(BuildContext context,List<dynamic> downloadedWordLists) {
     showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        List<DropdownMenuItem<String>> dropdownItems = dropdownValues
-          .map((item) =>
-              item['wordListName'].toString().replaceAll("_", " "))
-          .toList()
-          .map<DropdownMenuItem<String>>((String value) {
-        return DropdownMenuItem<String>(
-          value: value,
-          child: Text(value),
-        );
-      }).toList();
 
-      if (!dropdownItems.any((item) => item.value == appController.selectedDraggableWordsPageList.value.replaceAll("_", " "))) {
-        appController.setDraggableWordsPageList(dropdownItems.isNotEmpty ? dropdownItems.first.value! : "");
-      }
+      List<DropdownMenuItem<String>> dropdownItems = downloadedWordLists
+            .map((json) => word_list_model.fromJson(json))
+            .map<DropdownMenuItem<String>>((wordListModel) {
+          return DropdownMenuItem<String>(
+            value: wordListModel.wordListId,
+            child: Text(wordListModel.wordListName),
+          );
+        }).toList();
+
+        if (!dropdownItems.any((item) =>
+            item.value ==
+            appController.selectedScrollableWordsPageListId.value)) {
+          appController.setDraggableWordsPageListId(
+              dropdownItems.isNotEmpty ? dropdownItems.first.value! : "");
+        }
+
+      
         return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -110,12 +115,11 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
               
               Obx(()=>ListTile(
                 title: Text("Selected List"),
-                trailing:
-                DropdownButton<String>(
-                  value: appController.selectedDraggableWordsPageList.value.isEmpty ? null : appController.selectedDraggableWordsPageList.value.replaceAll("_", " "),
+                trailing: DropdownButton<String>(
+                  value: appController.selectedDraggableWordsPageListId.value.isEmpty ? null : appController.selectedDraggableWordsPageListId.value,
                   onChanged: (String? newValue) {
                     setState(() {
-                      appController.setDraggableWordsPageList(newValue!);
+                      appController.setDraggableWordsPageListId(newValue!);
                       _initDatabase();
                     });
                   },
@@ -140,7 +144,7 @@ class _DraggableWordCardsState extends State<DraggableWordCards> {
         actions: [
           IconButton(
             icon: Icon(Icons.settings),
-            onPressed: (){_showDropdownBottomSheet(context,dropdownValues);},
+            onPressed: (){_showDropdownBottomSheet(context,downloadedWordLists);},
           ),
         ],
         title: Text('Draggable Word Cards'),

@@ -19,7 +19,8 @@ class word_model{
     meaning3: json['meaning3'] as String?
   );
 
-  Map<String,dynamic> toJson() => {
+  Map<String,dynamic> toJson(String wordListId) => {
+    'wordListId' :wordListId,
     'word': word,
     'meaning1': meaning1,
     'meaning2': meaning2?? ' ',
